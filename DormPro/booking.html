@@ -114,18 +114,7 @@
                         <h1 class="text-white mb-4">Book A Room</h1>
                         <form>
                             <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control bg-white-50 text-dark" id="name" placeholder="Your Name">
-                                        <label for="name">Your Name</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <input type="email" class="form-control bg-white-50 text-dark" id="email" placeholder="Your Email">
-                                        <label for="email">Your Email</label>
-                                    </div>
-                                </div>
+                              
                                 <div class="col-md-6">
                                     <div class="form-floating date" id="date3" data-target-input="nearest">
                                         <input type="text" class="form-control bg-white-50 text-dark datetimepicker-input" id="datetime" placeholder="Date & Time" data-target="#date3" data-toggle="datetimepicker" />
@@ -140,6 +129,18 @@
                                        
                                         </select>
                                         <label for="gender">Gender</label>
+                                    </div>
+                          
+                                </div>
+								 <div class="col-md-6">
+                                <div class="form-floating">
+                                        <select class="form-select bg-white-50 text-dark" id="select1">
+                                            <option value="Room Of 3">Room Of 3</option>
+                                            <option value="Room Of 4">Room Of 4</option>
+                                            <option value="Room Of 6">Room Of 6</option>
+                                       
+                                        </select>
+                                        <label for="gender">Plan Name</label>
                                     </div>
                           
                                 </div>
@@ -193,6 +194,56 @@
 
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+	<script type="module">
+    //Update the below URL with the appropriate version if necessary.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.2.0/firebase-app.js";
+    import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      updateProfile 
+    //Update the below URL with the appropriate version if necessary.
+    } from "https://www.gstatic.com/firebasejs/9.2.0/firebase-auth.js";
+	   import {
+        getFirestore,
+        setDoc,
+        doc,
+        addDoc 
+      } from "https://www.gstatic.com/firebasejs/9.2.0/firebase-firestore.js";
+
+
+    // INSERT YOUR FIREBASE CONFIG OBJECT HERE
+    const firebaseConfig = {
+
+      apiKey: "AIzaSyAnAt57T3pVCU-Rw1GRw4tivhvBcC_NmzM",
+
+      authDomain: "dormpro-3f0e3.firebaseapp.com",
+
+      databaseURL: "https://dormpro-3f0e3-default-rtdb.firebaseio.com",
+
+      projectId: "dormpro-3f0e3",
+
+      storageBucket: "dormpro-3f0e3.appspot.com",
+
+      messagingSenderId: "688445848812",
+
+      appId: "1:688445848812:web:9fba956b87f59bf756f9c9",
+
+      measurementId: "G-119MDWZXMR"
+
+    };
+
+
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+	const db = getFirestore(app);
+	
+	
+
+	</script>
 
 
     <!-- JavaScript Libraries -->

@@ -82,7 +82,7 @@
 						  <option value="male">Male</option>
                           <option value="female">Female</option>
 				  </select>
-                  <label for="register-password">Gender</label>
+                  <label for="register-gender">Gender</label>
               </div>
           </div>
 
@@ -128,10 +128,17 @@
         signInWithEmailAndPassword,
         onAuthStateChanged,
         signOut,
-      updateProfile 
+      updateProfile,
+	 
     //Update the below URL with the appropriate version if necessary.
     } from "https://www.gstatic.com/firebasejs/9.2.0/firebase-auth.js";
-
+	import {
+		get,
+		getDatabase,
+		ref,
+		set,
+		child
+	} from "https://www.gstatic.com/firebasejs/9.2.0/firebase-database.js"
 
     // INSERT YOUR FIREBASE CONFIG OBJECT HERE
     const firebaseConfig = {
@@ -158,13 +165,12 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+	const db = getDatabase(app);
 
     const userEmail = document.querySelector("#register-email");
     const userName= document.getElementById("register-username");
     const userPassword = document.querySelector("#register-password");
-	const userGender = document.querySelector("#register-gender");
-	const userGenderOption = userGender.options[userGender.selectedIndex];
-	const userGenderOptionValue = userGenderOption.value;
+	
 
 	
     
@@ -175,37 +181,58 @@
     const signOutButton = document.querySelector("#signOutButton");
 
     
+	const createUser = async()=>{
+	   const signUpEmail = userEmail.value;
+        const signUpPassword = userPassword.value;
+      const displayName = userName.value;
+	  const userGender = document.querySelector("#register-gender");
+	const userGenderOption = userGender.options[userGender.selectedIndex];
+	const userGenderOptionValue = userGenderOption.value;
+try {
+  const userCredential = await createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword);
+  const user = userCredential.user;
+  console.log(user);
+  
+  localStorage.setItem("email", signUpEmail);
+
+  await updateProfile(user, { displayName: displayName, gender: userGenderOptionValue });
+  console.log("Display Name set successfully:", displayName);
+  alert("Your account has been created!");
+  
+  set(ref(db, 'users/' + signUpEmail.replace(/\./g, "-dot-")),{
+  name: displayName,
+  email: signUpEmail,
+  gender: userGenderOptionValue
+}).then(() => {
+}).catch((error) => {
+  console.error('Error storing data:', error);
+});
+  return true;
+} catch (error) {
+  
+    console.error("Unexpected error:", error);
+  
+  return false;
+}
+
+	
+	}
     const userSignUp = async() => {
         const signUpEmail = userEmail.value;
         const signUpPassword = userPassword.value;
       const displayName = userName.value;
-      if(displayName!== null && signUpEmail !== null && signUpPassword !== null && userGenderOptionValue  !== null ){
-        createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
-        .then((userCredential) => {
-          
-            const user = userCredential.user;
-            console.log(user);
-          localStorage.setItem("email", signUpEmail)
-          updateProfile(user, { displayName: displayName, gender: userGenderOptionValue })
-          .then(() => {
+	  const userGender = document.querySelector("#register-gender");
+	const userGenderOption = userGender.options[userGender.selectedIndex];
+	const userGenderOptionValue = userGenderOption.value;
+	  let alreadyCreated = false; // Initialize the variable
+	  
 
-            // Profile updated successfully
-            console.log("Display Name set successfully:", displayName);
-            alert("Your account has been created!");
-          })
-          .catch((error) => {
-            // Handle errors
-            console.error("Error setting Display Name:", error.message);
-          });
+	
+     if( displayName!== null && signUpEmail !== null && signUpPassword !== null && userGenderOptionValue  !== null ){
+		
 
-            
-       
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(errorCode + errorMessage)
-        })
+		createUser();
+
       }
       else{
         alert("Please enter all fields")
@@ -222,14 +249,16 @@
           
             const user = userCredential.user;
             alert("You have signed in successfully!");
-          
+			return true;
           
 
         })
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(errorCode + errorMessage)
+            console.log(errorCode + errorMessage);
+			alert("Invalid login credentials")
+			return false;
         })
     }
 

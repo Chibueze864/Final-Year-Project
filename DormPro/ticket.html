@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Tourist - Travel Agency HTML Template</title>
+    <title>DormPro</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="" name="keywords" />
     <meta content="" name="description" />
@@ -86,6 +86,8 @@
               <p class="small text-muted"></p>
               <p class="small text-muted"> Hostel</p>
               <p class="small text-muted" id="email-paragraph"></p>
+              <p class="small text-muted" id="username-paragraph"></p>
+              <p class=" text-danger" id="payment-paragraph"></p>
 
               <a
                 class="btn btn-sm btn-primary px-5 py-2"
@@ -116,11 +118,17 @@
         getAuth,
       } from "https://www.gstatic.com/firebasejs/9.2.0/firebase-auth.js";
 
-      import {
-        getFirestore,
+            import {
+      getFirestore,
         setDoc,
         doc,
-        addDoc 
+        addDoc,
+		getDocs,
+		query,
+		collection,
+		where,
+		orderBy,
+		updateDoc
       } from "https://www.gstatic.com/firebasejs/9.2.0/firebase-firestore.js";
 
       // INSERT YOUR FIREBASE CONFIG OBJECT HERE
@@ -147,20 +155,30 @@
 
       const bookButton = document.querySelector("#bookButton");
       const emailParagraph = document.querySelector("#email-paragraph");
+      const nameParagraph = document.querySelector("#username-paragraph");
+      const paymentParagraph = document.querySelector("#payment-paragraph");
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
-      
+     
+
+const collectionRef = collection(db, "hostel_reservation");
 
       // Function to get user display name by email stored in local storage
-     onAuthStateChanged(auth, (user) => {
-		 console.log(auth.currentUser)
+     onAuthStateChanged(auth, async (user) => {
+	 
 	if (user) {
-	emailParagraph.innerHTML = "Email: " + auth.currentUser.email
+	let email = auth.currentUser.email;
+	emailParagraph.innerHTML = "Email: " + email;
+	nameParagraph.innerHTML = "User name: " + auth.currentUser.displayName;
+	const reservation = await fetchReservationByEmail(email);
      // User is signed in, see docs for a list of available properties
     // https://firebase.google.com/docs/reference/js/auth.user
-
-		console.log(user);
+	
+	bookButton.style.display = reservation[0].meal_plan ? "" : "none";
+	paymentParagraph.textContent = "You have not paid for the meal plan"
+	paymentParagraph.style.display = reservation[0].meal_plan ? "none" : "";
+		console.log(reservation);
     // ...
   } else {
     // User is signed out
@@ -169,6 +187,26 @@
   }
 });
 	
+	async function fetchReservationByEmail(email) {
+		let keys = []
+
+    try {
+        const querySnapshot = await getDocs(collectionRef);
+
+        querySnapshot.forEach((doc) => {
+			let id = doc.id;
+			let user_info = doc.data()
+			user_info.real_id = id
+			
+            keys.push(user_info);
+        });
+		return keys.filter(key => key.real_id.includes(email));
+    } catch (error) {
+        console.error("Error getting documents: ", error);
+    }
+
+    console.log("Keys outside fetchData:", keys);
+}
     
 
 
@@ -210,13 +248,14 @@
             const formattedDate = currentDate.toISOString().split('T')[0]; // Get YYYY-MM-DD format
 
             // Concatenate strings using the + operator
-            const ticketID = email + "-" + meal+ "-" + formattedDate;
+            const ticketID = email + "-" + time+ "-" + formattedDate;
             // Set the document in the "ticket" collection
 
           await setDoc(doc(db, "ticket", ticketID), {
-              time: time,
-              meal: meal,
-              email:email
+              meal_type: time,
+              meal_eaten: meal,
+              email:email,
+			  redeemed: false
             });
 
 

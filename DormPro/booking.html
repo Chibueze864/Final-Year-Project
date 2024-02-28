@@ -103,7 +103,7 @@
     <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container">
             <div class="booking p-5">
-                <div class="row g-5 align-items-center">
+                <div class="row g-5 align-items-center ">
                     <div class="col-md-6 text-white">
                         <h6 class="text-white text-uppercase">Booking</h6>
                         <h1 class="text-white mb-4">Online Booking</h1>
@@ -115,15 +115,10 @@
                         <form>
                             <div class="row g-3">
                               
-                                <div class="col-md-6">
-                                    <div class="form-floating date" id="date3" data-target-input="nearest">
-                                        <input type="text" class="form-control bg-white-50 text-dark datetimepicker-input" id="datetime" placeholder="Date & Time" data-target="#date3" data-toggle="datetimepicker" />
-                                        <label for="datetime">Date & Time</label>
-                                    </div>
-                                </div>
+                               
                                 <div class="col-md-6">
                                 <div class="form-floating">
-                                        <select class="form-select bg-white-50 text-dark" id="select1">
+                                        <select class="form-select bg-white-50 text-dark" id="gender">
                                             <option value="male">Male</option>
                                             <option value="female">Female</option>
                                        
@@ -134,19 +129,19 @@
                                 </div>
 								 <div class="col-md-6">
                                 <div class="form-floating">
-                                        <select class="form-select bg-white-50 text-dark" id="select1">
+                                        <select class="form-select bg-white-50 text-dark" id="plan">
                                             <option value="Room Of 3">Room Of 3</option>
                                             <option value="Room Of 4">Room Of 4</option>
                                             <option value="Room Of 6">Room Of 6</option>
                                        
                                         </select>
-                                        <label for="gender">Plan Name</label>
+                                        <label for="plan">Plan Name</label>
                                     </div>
                           
                                 </div>
                                 <div class="col-md-6">
                                 <div class="form-floating">
-                                        <select class="form-select bg-white-50 text-dark" id="select1">
+                                        <select class="form-select bg-white-50 text-dark" id="hostel">
                                             <option value="zambezi">Zambezi: 300-500 lvl</option>
                                           <option value="blue-nile">Blue Nile: 100-200 lvl</option>
                                           <option value="orange-nile">Orange Nile: 200-300 lvl</option>
@@ -154,28 +149,68 @@
                           
 
                                         </select>
-                                        <label for="select1">Hostel</label>
+                                        <label for="hostel">Hostel</label>
                                     </div>
 
                                 </div>
+								
                               <div class="col-md-6">
                               <div class="form-floating">
-                                      <select class="form-select bg-white-50 text-dark" id="select1">
+                                      <select class="form-select bg-white-50 text-dark" id="floor">
                                           <option value="ground-floor">Ground Floor</option>
                                         <option value="first-floor">First Floor</option>
                                         <option value="second-floor">Second Floor</option>
-                                        <option value="third-floor">Third Floor</option>
+                                        <option value="third-floor" >Third Floor</option>
                                     
 
                                       </select>
-                                      <label for="select1">Preferred Floor</label>
+                                      <label for="floor">Preferred Floor</label>
+                                  </div>
+
+                              </div>
+
+<div class="col-md-6">
+                              <div class="form-floating">
+                                      <select class="form-select bg-white-50 text-dark" id="invite">
+                                          <option value="invite-yes">Yes</option>
+                                        <option value="invite-no">No</option>
+
+                                    
+
+                                      </select>
+                                      <label for="floor">Book With Friends?</label>
+                                  </div>
+
+                              </div>
+							  <div class="col-md-6">
+                              <div class="form-floating">
+                                      <select class="form-select bg-white-50 text-dark" id="meal">
+                                          <option value="meal-yes">Yes</option>
+                                        <option value="meal-no">No</option>
+
+                                    
+
+                                      </select>
+                                      <label for="meal">Meal Included?</label>
+                                  </div>
+
+                              </div>
+
+							  
+							  <div class="col-md-6">
+                              <div class="form-floating">
+                                      <select class="form-select bg-white-50 text-dark" id="room">
+                                      
+
+                                      </select>
+                                      <label for="room">Preferred Room</label>
                                   </div>
 
                               </div>
 
                               
                                 <div class="col-12">
-                                    <button class="btn btn-outline-light w-100 py-3" type="submit">Book Now</button>
+                                    <a class="btn btn-outline-light w-100 py-3"  id="reserve" >Book Now</a>
                                 </div>
                             </div>
                         </form>
@@ -210,7 +245,11 @@
         getFirestore,
         setDoc,
         doc,
-        addDoc 
+        addDoc,
+		getDocs,
+		query,
+		collection,
+		where
       } from "https://www.gstatic.com/firebasejs/9.2.0/firebase-firestore.js";
 
 
@@ -235,12 +274,305 @@
 
     };
 
+      const reserveButton = document.querySelector("#reserve");
 
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 	const db = getFirestore(app);
 	
+	async function updateRoomOptions() {
+    var floorSelect = document.getElementById("floor");
+    var roomSelect = document.getElementById("room");
+    var hostelSelect = document.getElementById("hostel");
+    var floorValue = floorSelect.value;
+
+    // Clear existing room options
+    roomSelect.innerHTML = "";
+
+
+    // Generate room options based on the selected floor
+    var startRoom, endRoom;
+    switch (floorValue) {
+        case "ground-floor":
+            startRoom = 1;
+            endRoom = 20;
+            break;
+        case "first-floor":
+            startRoom = 101;
+            endRoom = 120;
+            break;
+        case "second-floor":
+            startRoom = 201;
+            endRoom = 220;
+            break;
+        case "third-floor":
+            startRoom = 301;
+            endRoom = 320;
+            break;
+        default:
+            // Default to ground floor if floorValue is not recognized
+            startRoom = 1;
+            endRoom = 20;
+            break;
+    }
+
+    var option = document.createElement("option");
+    option.value = "";
+    option.textContent = "";
+    roomSelect.appendChild(option);
+
+
+    // Generate room options based on the selected floor, excluding booked rooms
+    for (var roomNum = startRoom; roomNum <= endRoom; roomNum++) {
+        // Check if the room is booked and meets the specified criteria
+        
+        // Add the room option only if it's not booked
+            var option = document.createElement("option");
+            option.value = roomNum.toString().padStart(3, "0");
+            option.textContent = roomNum.toString().padStart(3, "0"); // Pad room number with leading zeros
+            roomSelect.appendChild(option);
+     
+    }
+}
+
+
+	
+	// Add event listener to floor select to update room options
+    var floorSelect = document.getElementById("floor");
+    floorSelect.addEventListener("change", updateRoomOptions);
+
+    // Initialize room options based on the default floor selection
+    updateRoomOptions();
+	
+	
+	// Function to dynamically update hostel options based on selected gender
+function updateHostelOptions() {
+    const genderSelect = document.getElementById('gender');
+    const hostelSelect = document.getElementById('hostel');
+    const selectedGender = genderSelect.value;
+
+    // Clear previous options
+    hostelSelect.innerHTML = '';
+	
+
+
+    // Define default options based on selected gender
+    const defaultOptions = {
+        male: [
+            { value: '', text: '' },
+            { value: 'zambezi', text: 'Zambezi: 300-500 lvl' },
+            { value: 'blue-nile', text: 'Blue Nile: 100-200 lvl' },
+            { value: 'orange-nile', text: 'Orange Nile: 200-300 lvl' },
+            { value: 'congo', text: 'Congo House: 100 lvl' }
+        ],
+        female: [
+            { value: '', text: '' },
+            { value: 'white-nile', text: 'White Nile: 100-300 lvl' },
+            { value: 'nile-delta', text: 'Nile Delta: 100 lvl' },
+            { value: 'shebelle', text: 'Shebelle: 100-300 lvl' },
+            { value: 'missisipi', text: 'Missisipi: 300, 400 & 500 Level' }
+        ]
+    };
+
+    // Add default options to select element
+    defaultOptions[selectedGender].forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+        hostelSelect.appendChild(optionElement);
+    });
+
+    // Update hostel select value based on selected gender
+    hostelSelect.value = defaultOptions[selectedGender][0].value;
+}
+// Run updateHostelOptions whenever gender select changes
+document.getElementById('gender').addEventListener('change', updateHostelOptions);
+updateHostelOptions(); // Run initially with default gender options
+
+	
+	// Declare global variables to store input and select values
+let selectedValues = {};
+
+// Function to get selected value from a select element by element id
+function getSelectedValue(elementId) {
+  var element = document.getElementById(elementId);
+  selectedValues[elementId] = element.value; // Update global selectedValues object
+  return element.value;
+}
+
+// Function to update selected value from a select element
+function updateSelectedValue(element) {
+  selectedValues[element.id] = element.value; // Update global selectedValues object
+  return element.value;
+}
+
+
+// Run getSelectedValue and getInputValue on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Get selected value of select elements
+  document.querySelectorAll('select').forEach(select => {
+    selectedValues[select.id] = select.value; // Update global selectedValues object
+  });
+});
+
+// Add event listeners to all select elements to update selected value on change
+document.querySelectorAll('select').forEach(select => {
+  select.addEventListener('change', function() {
+    updateSelectedValue(select);
+    console.log(`Selected values:`, selectedValues);
+  });
+});
+
+async function fetchReservation(collectionRef) {
+		let keys = []
+
+    try {
+        const querySnapshot = await getDocs(collectionRef);
+
+        querySnapshot.forEach((doc) => {
+            keys.push(doc.id);
+        });
+		return keys;
+    } catch (error) {
+        console.error("Error getting documents: ", error);
+    }
+
+    console.log("Keys outside fetchData:", keys);
+}
+
+
+async function roomsTaken() {
+		let keys = []
+const collectionRef = collection(db, "hostel_reservation");
+
+    try {
+        const querySnapshot = await getDocs(collectionRef);
+
+        querySnapshot.forEach((doc) => {
+			let hostel = doc.data().hostel;
+			let room = doc.data().room;
+			let approved = doc.data().approved;
+			let invite = doc.data().invite;
+			let room_capacity = doc.data().room_capacity;
+			
+			let roomInfo = {
+				hostel,
+				room,
+				approved,
+				invite
+			}
+            keys.push(roomInfo);
+        });
+		return keys;
+    } catch (error) {
+        console.error("Error getting documents: ", error);
+    }
+
+    console.log("Keys outside fetchData:", keys);
+}
+
+
+	const isAnyStringValueEmpty = obj => Object.values(obj).some(value => typeof value === 'string' && value.trim() === '');
+
+
+
+function getTotalPeopleInRoom(rooms, room, hostel) {
+  return rooms.reduce((count, roomData) => {
+    // Include rooms with matching room and hostel, regardless of no_members value
+    return count + (roomData.room === room && roomData.approved == "yes" && roomData.hostel === hostel ? 1 : 0);
+  }, 0);
+}
+
+	    const bookReservation = async () => {
+		       let email = auth.currentUser?.email;
+
+console.log(email)
+
+		console.log(selectedValues)
+		const currentDate = new Date();
+const year = currentDate.getFullYear();
+const month = currentDate.getMonth() + 1; // Month is zero-indexed, so we add 1
+const day = currentDate.getDate();
+
+const formattedDate = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+
+            const reserveID = email + "-" + selectedValues.hostel+ "-" + formattedDate;
+
+const collectionRef = collection(db, "hostel_reservation");
+
+    let keys = await fetchReservation(collectionRef);
+	const filteredKeys = keys.filter(key => key.includes(email));
+
+    console.log("Keys:", keys);
+// Check if the conditions are met for any booked room
+
+	const bookedRooms = await roomsTaken();
+
+let isRoomBooked = false;
+isRoomBooked = bookedRooms.some(room => {
+    return (
+        room.hostel === selectedValues.hostel &&
+        room.invite === "yes" &&
+        room.room === selectedValues.room&&
+		room.approved === "yes"
+    );
+});
+console.log(isRoomBooked);
+let noRoomMembers = getTotalPeopleInRoom(bookedRooms, selectedValues.room, selectedValues.hostel)
+console.log(noRoomMembers)
+console.log(bookedRooms)
+let inviting = bookedRooms.some(room => room.room === selectedValues.room && room.hostel === selectedValues.hostel) ? "no" : selectedValues.invite.replace(/^invite-/, '');
+console.log(inviting)
+const isRoomFull = (noRoomMembers, bookedRooms) => {
+  return parseInt(noRoomMembers) === parseInt(bookedRooms.room_capacity);
+};
+	 if(isAnyStringValueEmpty(selectedValues)){
+				alert("Please enter all inputs")
+
+	}
+		else if(isRoomBooked){
+		alert("Room is already booked")
+	
+	}else if(isRoomFull){
+		
+		alert("Sorry the room is full")
+	}
+	
+	else if (filteredKeys.length > 0){
+		alert("You have already made a reservation")
+	}
+	
+	else{
+	
+	
+		 // Concatenate strings using the + operator
+            const reserveID = email + "-" + selectedValues.hostel+ "-" + formattedDate;
+            // Set the document in the "ticket" collection
+
+          await setDoc(doc(db, "hostel_reservation", reserveID), {
+room_capacity: selectedValues.plan.match(/\d+/)[0],
+              hostel: selectedValues.hostel,
+              floor: selectedValues.floor,
+              meal_plan: selectedValues.meal === "meal-yes" ? true : false,
+			  room: selectedValues.room,
+              user_id:email.replace(/\./g, "-dot-"),
+			  approved: "waiting",
+			  code:"",
+			  invite: inviting,
+			  no_members:String(noRoomMembers)
+			  
+            });
+			alert("Hostel Request Sent")
+        
+	
+	}
+		
+		
+		}
+
+	 reserveButton.addEventListener("click", bookReservation);
+
 	
 
 	</script>

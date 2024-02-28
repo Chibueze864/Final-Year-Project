@@ -13,6 +13,7 @@ class Footer extends HTMLElement {
                     <a class="btn btn-link" href="booking.html">Book A Room</a>
                     <a class="btn btn-link" href="login.html">Login</a>
                     <a class="btn btn-link" href="ticket.html">Meal Ticket</a>
+                    <a class="btn btn-link" href="invite.html">Join Via Code</a>
                    
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -40,6 +41,7 @@ class Footer extends HTMLElement {
                             <a href="booking.html">Book A Room</a>
                             <a href="ticket.html">Meal Ticket</a>
                             <a href="register.html">Login</a>
+                            <a href="invite.html">Join Via Code</a>
                         </div>
                     </div>
                 </div>

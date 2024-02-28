@@ -37,6 +37,7 @@ class Header extends HTMLElement {
                      <a href="profile.html" class="nav-item nav-link" >Profile</a>
                     <a href="ticket.html" class="nav-item nav-link text-dark">Meal Ticket</a>
                     <a href="register.html" class="nav-item nav-link text-dark">Login</a>
+                    <a href="invite.html" class="nav-item nav-link text-dark">Join Via Code</a>
                    
                 </div>
 
@@ -55,7 +56,7 @@ class Header extends HTMLElement {
 
     
   
-}
+
 
 
        
